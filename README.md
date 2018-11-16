@@ -1,5 +1,7 @@
 # qemu-composer
 
+[![Build Status](https://travis-ci.org/lunhg/qemu-composer.svg?branch=master)](https://travis-ci.org/lunhg/qemu-composer)
+
 `qemu-composer` is a little python script that composes a `docker-compose.yml` file with multiple references of `Dockerfile`s, with appropriate variables, assign multiple one-time cross-compilation images. 
 
 ## Whats is intented
