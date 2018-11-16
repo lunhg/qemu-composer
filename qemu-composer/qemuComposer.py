@@ -74,13 +74,13 @@ class QemuComposer(object):
                 self.__register__("mkdir -p %s/%s/%s" % (self.prefix, self.qemu['prefix'], t))
                 self.__register__("mkdir -p %s/%s/%s/%s" % (self.prefix, self.qemu['prefix'], t, a))
                 self.__register__("touch %s/%s/%s/%s/Dockerfile" % (self.prefix, self.qemu['prefix'], t, a))
-                self.__register__("echo 'FROM %s:%s-%s' >> %s/%s/%s/%s/Dockerfile" % (self.qemu['base'], t, a, self.prefix, self.qemu['prefix'], t, a))
+                self.__register__("echo 'FROM %s:%s-%s' >> %s/%s/%s/%s/Dockerfile" % (self.qemu['base'], a, t, self.prefix, self.qemu['prefix'], t, a))
                 self.__register__("echo 'ARG USER' >> %s/%s/%s/%s/Dockerfile" % (self.prefix, self.qemu['prefix'], t, a))
                 self.__register__("echo 'RUN addgroup --gid %s %s' >>  %s/%s/%s/%s/Dockerfile" % (self.gid, self.group, self.prefix, self.qemu['prefix'], t, a))
                 self.__register__("echo 'RUN adduser --force-badname --ingroup %s --uid %s --disabled-password --home /home/$USER $USER' >> %s/%s/%s/%s/Dockerfile" % (self.group, self.uid, self.prefix, self.qemu['prefix'], t, a))
                 self.__register__("echo 'RUN echo \'%s ALL=(ALL) NOPASSWD: ALL\' > /etc/sudoers' >> %s/%s/%s/%s/Dockerfile" % ('%'+self.group, self.prefix, self.qemu['prefix'], t, a))
                 for e in self.qemu['env']:
-                    self.__register__("echo '        - \'%s\'' >> %s/%s/docker-compose.yml" % (e, self.prefix, self.qemu['prefix']))
+                    self.__register__("echo '        - \"%s\"' >> %s/%s/docker-compose.yml" % (e, self.prefix, self.qemu['prefix']))
                     self.__register__("echo 'ARG %s' >> %s/%s/%s/%s/Dockerfile" % (e.split("=")[0], self.prefix, self.qemu['prefix'], t, a))
                 for __cmd__ in self.qemu['before_install']:
                     self.__register__("echo 'RUN %s' >> %s/%s/%s/%s/Dockerfile" % (__cmd__, self.prefix, self.qemu['prefix'], t, a))
