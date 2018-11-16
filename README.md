@@ -37,6 +37,9 @@ base: multiarch/debian-debootstrap
 # The generated images if you want to share
 image: redelivre/qemu-alpine-builder
 
+# Where alll will builded <--prefix from cli>/.bin
+prefix: .bin
+
 # Register runtime options 
 options:
   - --rm
