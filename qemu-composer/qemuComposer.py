@@ -60,12 +60,12 @@ class QemuComposer(object):
         self.__register__("docker run %s" % self.register)
         self.__register__("mkdir -p %s/%s" % (self.prefix, self.qemu['prefix']))
         self.__register__("touch %s/%s/docker-compose.yml" % (self.prefix, self.qemu['prefix']))
-        self.__register__("echo 'version: %s' >> %s/%s/docker-compose.yml" % (self.qemu['version'], self.prefix, self.qemu['prefix']))
+        self.__register__("echo 'version: \"%s\"' >> %s/%s/docker-compose.yml" % (self.qemu['version'], self.prefix, self.qemu['prefix']))
         self.__register__("echo 'services:' >> %s/%s/docker-compose.yml" % (self.prefix, self.qemu['prefix']))
         for t in self.qemu['targets']:
             for a in self.qemu['arches']:
                 self.__register__("echo '  %s_%s:' >> %s/%s/docker-compose.yml" % (t, a, self.prefix, self.qemu['prefix']))
-                self.__register__("echo '    image: %s' >> %s/%s/docker-compose.yml" % (self.qemu['image'], self.prefix, self.qemu['prefix']))
+                self.__register__("echo '    image: %s:%s-%s' >> %s/%s/docker-compose.yml" % (self.qemu['image'], t, a, self.prefix, self.qemu['prefix']))
                 self.__register__("echo '    build:' >> %s/%s/docker-compose.yml" % (self.prefix, self.qemu['prefix']))
                 self.__register__("echo '      context: %s/%s/%s/%s' >> %s/%s/docker-compose.yml" % (self.prefix, self.qemu['prefix'], t, a, self.prefix, self.qemu['prefix']))
                 self.__register__("echo '      dockerfile: Dockerfile' >> %s/%s/docker-compose.yml" % (self.prefix, self.qemu['prefix']))
@@ -82,4 +82,11 @@ class QemuComposer(object):
                 for e in self.qemu['env']:
                     self.__register__("echo '        - \'%s\'' >> %s/%s/docker-compose.yml" % (e, self.prefix, self.qemu['prefix']))
                     self.__register__("echo 'ARG %s' >> %s/%s/%s/%s/Dockerfile" % (e.split("=")[0], self.prefix, self.qemu['prefix'], t, a))
+                for __cmd__ in self.qemu['before_install']:
+                    self.__register__("echo 'RUN %s' >> %s/%s/%s/%s/Dockerfile" % (__cmd__, self.prefix, self.qemu['prefix'], t, a))
+                self.__register__("echo 'USER $USER' >> %s/%s/%s/%s/Dockerfile" % (self.prefix, self.qemu['prefix'], t, a))
+                self.__register__("echo 'WORKDIR /home/$USER' >> %s/%s/%s/%s/Dockerfile" % (self.prefix, self.qemu['prefix'], t, a))
+                for c in ['install', 'after_install', 'before_script', 'script', 'after_script']:
+                    for __cmd__ in self.qemu[c]:
+                        self.__register__("echo 'RUN %s' >> %s/%s/%s/%s/Dockerfile" % (__cmd__, self.prefix, self.qemu['prefix'], t, a))
 
