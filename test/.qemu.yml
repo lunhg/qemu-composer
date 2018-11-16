@@ -1,0 +1,52 @@
+version: '2'
+
+register: multiarch/qemu-user-static:register
+
+base: multiarch/debian-debootstrap
+
+image: redelivre/qemu-test
+
+prefix: .bin
+
+# Register runtime options 
+options:
+  - --rm
+  - --privileged
+
+# Register runtime commands
+commands:
+  - --reset
+
+# base image arches
+arches:
+  - arm64
+
+# base image targets
+targets:
+  - jessie
+
+# The environment os builds
+env:
+  - REPO=lunhg/qemu-composer
+  - BRANCH=master
+
+# RUN commands
+# User is root on this point
+before_install:
+  - echo "`whoami` running `uname -a` at `hostname`"
+  
+# User isnt root on this point
+install:
+  - echo "`whoami` running `uname -a` at `hostname`"
+      
+after_install:
+  - echo "`whoami` running `uname -a` at `hostname`"
+  
+before_script:
+  - echo "`whoami` running `uname -a` at `hostname`"
+  
+script:
+  - echo "`whoami` running `uname -a` at `hostname`"
+  
+after_script:
+  - echo "`whoami` running `uname -a` at `hostname`"

@@ -1,0 +1,4 @@
+.tox/
+test/.bin/
+test/__pycache__
+qemu-composer/*.pyc

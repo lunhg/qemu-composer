@@ -1,0 +1,19 @@
+language: python
+
+# Default linux jobs
+os: linux
+sudo: required
+dist: trusty
+
+cache:
+  directories:
+    - $HOME/test/.bin
+
+script:
+  - tox
+  - docker-compose up -d --project-directory $HOME/test
+
+# don't notify me when things fail
+notifications:
+  email: false
+
