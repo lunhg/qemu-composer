@@ -13,8 +13,8 @@ class QemuComposer(object):
         options = " ".join(str(x) for x in self.qemu['options'])
         commands = " ".join(str(x) for x in self.qemu['commands'])
         self.register = "%s %s %s" % (
-            self.qemu['register'],
             options,
+            self.qemu['register'],
             commands
         )
         self.images = self.__images__()
