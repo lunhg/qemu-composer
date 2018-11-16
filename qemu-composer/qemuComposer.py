@@ -46,7 +46,7 @@ class QemuComposer(object):
     def make(self):
         for cmd in self.commands:
             print "[ exec ] %s" % cmd
-            subprocess.call(cmd)
+            os.system(cmd)
 
     def build(self):
         # Show configuration
