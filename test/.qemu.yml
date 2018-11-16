@@ -19,6 +19,8 @@ commands:
 
 # base image arches
 arches:
+  - armhf
+  - armel
   - arm64
 
 # base image targets
