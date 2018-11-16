@@ -11,7 +11,7 @@ cache:
 
 script:
   - tox
-  - docker-compose up -d --project-directory $HOME/test
+  - docker-compose --project-directory $HOME/test up
 
 # don't notify me when things fail
 notifications:
