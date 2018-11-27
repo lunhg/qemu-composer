@@ -23,4 +23,9 @@ setup(
         "Topic :: Utilities",
         "License :: BSD License",
     ],
+    entry_points = {
+        'console_scripts': [
+            'qemu-composer = qemu_composer.__main__:main'
+        ]
+    }
 )

@@ -1,28 +1,42 @@
 # qemu-composer
 
-[![Build Status](https://travis-ci.org/lunhg/qemu-composer.svg?branch=master)](https://travis-ci.org/lunhg/qemu-composer)
+[![Build Status](https://travis-ci.org/lunhg/qemu-composer.svg?branch=master)](https://travis-ci.org/lunhg/qemu-composer) [![Coverage Status](https://coveralls.io/repos/github/lunhg/qemu-composer/badge.svg?branch=master)](https://coveralls.io/github/lunhg/qemu-composer?branch=master)
 
-`qemu-composer` is a little python script that composes a `docker-compose.yml` file with multiple references of `Dockerfile`s, with appropriate variables, assign multiple one-time cross-compilation images. 
+`qemu-composer` is a python command line interface that composes a `docker-compose.yml` file  under a prefixed/posfixed path with multiple references to many `Dockerfile`. These files are indexed under appropiated paths and variables, assigning a single cross-compilation images for many processor architetures within a containerized, at the current version, in a debian environment.
 
 ## Whats is intented
 
-This script are apropriated if you want your software developed in worksation running in, let's say, a Raspberry Pi or another uncommon architeture.
+Supose that you want a software developed in your laptop running in a Raspberry Pi with `arm* ` architeture (like is my case).
 
-Let's call `A` a software developed in your `i386`or `x86_64`.  This can be called `A-i386`or `A-x86_64`.
-
-If you want your `A` software ( `A-i386/A-x86_64`)  to be cross-compiled to another architetures, saying `A-armel`, `A-arm64` (`A-aarch64`) , or many others, you can be at the gates of a hell of `Dockerfile`s an multiple services at a `docker-compose` file.
+Let's call `A` that software developed in your `i386`or `x86_64`.  This wiil be `A-i386`or `A-x86_64`. The `A` software ( `A-i386/A-x86_64`) will be cross-compiled to another architetures, saying `A-armel`, `A-arm64` (`A-aarch64`).
 
 ## Using
 
-This script is intented to be used with travis-ci.
+This script is intented to be used with travis-ci, but you can use locally.
 
-### Instalation 
+### Instalation from pip
 
-`pip install qemu-composer`
+`$ pip install qemu-composer`
+
+### Instalation from source
+
+```
+$ git clone https://www.github.com/lunhg/qemu-composer.git
+$ cd qemu-composer/
+$ pip install -e .
+```
 
 ### Configuration
 
-Build a `.qemu.yml` file and follow a hybrid structure of `docker-compose.yml` files and `.travis.yml` files, i.e, this file run under a `docker-compose.yml` version field, qemu specific fields and `before_install`, `install`, ..., fields:
+Create a `.qemu.yml` file that follow a hybrid structure of `docker-compose.yml` files and `.travis.yml` files.
+
+This file will:
+
+  - create a `docker-compose.yml` with apropriated version field
+  - register a special `docker` image that runs `QEMU`
+  - base the qemu specific architeture, that generates a `FROM <base>` directive in `Dockerfile`s
+  - register a `before_install` command field  running under root privilegies
+  - register `install` and subsequent command fields running a user with a randomic name
 
 ```
 # Same as docker-compose `version`field
@@ -32,8 +46,7 @@ version: '2'
 # The registering qemu binaries to be used
 register: multiarch/qemu-user-static:register
 
-# The prefix name of images to be used
-# in the one-time cross-compilation
+# The prefix name of images to be used in the one-time cross-compilation in Dockerfile as FROM * 
 base: multiarch/debian-debootstrap
 
 # The generated images if you want to share
@@ -53,10 +66,13 @@ commands:
 
 # base image arches
 arches:
+  - armel
+  - armhf
   - arm64
 
 # base image targets
 targets:
+  - wheezy
   - jessie
 
 # The environment os builds
@@ -71,6 +87,7 @@ before_install:
   - echo "`whoami` running `uname -a` at `hostname`"
   - apt-get update
   - apt-get install -y <pkg>
+  ...
 
 # User isnt root on this point
 install:
@@ -94,17 +111,48 @@ after_script:
   ...
 ```
 
-## Running
+### Running tests
+
+  - Simple test: 
+  
+  ```
+  $ pytest
+  ```
+  
+  - Complete test: 
+  
+  ```
+  $ sudo COVERALLS_TOKEN=<token> tox
+  ```
+  
+  If you found a compilation error from `cffi`, module, you will need to add a `CFLAGS` environment variable.
+  
+  This occurs when you are using a non-debian OS, like a Archlinux:
+  
+  ```
+  $ sudo COVERALLS_TOKEN=<token> CFLAGS=-I/<path-to-libffi> tox
+  ```
+
+### LIBFFI paths:
+
+  - Archlinux: 
+    - path: /usr/lib/libffi-<version>/include:
+    - installing: `pacman -Syu libffi`
+  
+## Running as CLI
 
 `$ qemu-composer`
 
 This command is alias for:
 
-`$ qemu-composer --prefix $HOME/bin --file $HOME/.qemu.yml`
+`$ qemu-composer --prefix $PWD/<define prefix in file> --file .qemu.yml`
 
 ## Options
 
-| command | long form | short form | description                                                                                                                             |
-|---------|-----------|------------|-----------------------------------------------------------------------------------------------------------------------------------------|
-| prefix  | --prefix  | -p         | prefix a folder inside your project to populate the generated `docker-compose.yml` and `Dockerfile`s. Defaults to `<your project>/bin.  |
-| file    | --file    | -f         | use this file as the qemu-composer generator. Defaults to `<your project>/.qemu.yml`.                                                   |
+| Option name | long form | short form | description                                                      |
+|-------------|-----------|------------|------------------------------------------------------------------|
+| prefix      | --prefix  | -p         | Set a prefix where qemu-composer runs (default: $PWD)            |
+| file        | --file    | -f         | The file where qemu-composer is configured (default: .qemu.yml)  |
+| group       | --group   | -G         | The group of a passwordless user in qemu                         |
+| gid         | --gid     | -g         | The gid of the group                                             |
+| uid         | --uid     | -u         | The uid of passwordless user of qemu                             |

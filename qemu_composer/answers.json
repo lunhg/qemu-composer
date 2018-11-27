@@ -1,0 +1,9 @@
+{
+    "answers":
+	  [
+		    { 
+			      "question": "Do you wish to continue? (y,n)", 
+			      "answer": "y"
+		    },
+	  ]
+}
