@@ -27,12 +27,10 @@ env:
 
 
 before_install:
-  - make before_install
-  - tox
+  - make before_install tox
 
 install:
-  - pip install -r requirements.txt
-  - make install
+  - make requirements install
 
 before_script:
   - make before_script

@@ -3,6 +3,11 @@ before_install:
 		pip install --upgrade tox; \
 	fi
 
+requirements:
+	if [ $$TEST = "yes" ] || [ $$LOCAL = "yes" ];  then \
+		pip install -r requirements.txt; \
+	fi
+
 install:
 	if [ $$TEST = "yes" ] || [ $$LOCAL = "yes" ] || [ $$PIP = "yes" ];  then \
 		pip install -e .; \
@@ -55,3 +60,6 @@ coveralls:
 	if [ $$COVER = "yes" ]; then \
 		COVERALLS_REPO_TOKEN=$$COVERALLS_REPO_TOKEN coveralls; \
 	fi
+
+tox:
+	if [ $$TEST = "yes" ]; then tox; fi
