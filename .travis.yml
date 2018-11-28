@@ -20,14 +20,15 @@ env:
     - QEMU_UID=1000
     - DOCKER_COMPOSE_FILE='tests/.bin/docker-compose.yml'
   matrix:
-    - TEST="yes" LOCAL="no"  PIP="no"  HUB="no"
-    - TEST="no"  LOCAL="yes" PIP="no"  HUB="no"
-    - TEST="no"  LOCAL="yes" PIP="yes" HUB="no"
-    - TEST="no"  LOCAL="yes" PIP="no"  HUB="yes"
+    - TEST="yes" COVER="yes" LOCAL="no"  PIP="no"  HUB="no"
+    - TEST="no"  COVER="no"  LOCAL="yes" PIP="no"  HUB="no"
+    - TEST="no"  COVER="no"  LOCAL="yes" PIP="yes" HUB="no"
+    - TEST="no"  COVER="no"  LOCAL="yes" PIP="no"  HUB="yes"
 
 
 before_install:
   - make before_install
+  - tox
 
 install:
   - make install

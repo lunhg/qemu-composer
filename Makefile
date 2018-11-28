@@ -1,19 +1,17 @@
 before_install:
 	if [ $$TEST = "yes" ]; then \
-		pip install --upgrade tox \
-		echo 'repo_token: '$$COVERALLS_REPO_TOKEN > .coveralls.yml \
-    tox \
-    rm .coveralls.yml; \
-  fi
+		pip install --upgrade tox; \
+	fi
 
 install:
-	if [ $$LOCAL = "yes" ]; then \
-		pip install . ; \
+	if [ $$TEST = "yes" ] || [ $$LOCAL = "yes" ] || [ $$PIP = "yes" ];  then \
+		pip install -e .; \
 	fi
 
 before_script:
-	if [ $$LOCAL = "yes" ]; then \
-		qemu-composer --help; \
+	if [ $$TEST = "yes" ] || [ $$LOCAL = "yes" ] || [$$PIP = "yes" ]; then \
+		qemu-composer --version \
+		qemu-composer --help;	\
   fi
 
 script:
@@ -46,4 +44,14 @@ after_success:
 		docker login --username $$HUB_USERNAME \
 								 --password $$HUB_PWD \
 		docker-compose --file $$DOCKER_COMPOSE_FILE push; \
+	fi
+
+test:
+	if [ $$TEST = "yes" ]; then \
+		py.test --cov=qemu_composer tests/ --verbose; \
+	fi
+
+coveralls:
+	if [ $$COVER = "yes" ]; then \
+		COVERALLS_REPO_TOKEN=$$COVERALLS_REPO_TOKEN coveralls; \
 	fi
