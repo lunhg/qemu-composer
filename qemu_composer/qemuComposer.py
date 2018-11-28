@@ -1,6 +1,5 @@
 
 import os, sys, uuid, yaml, subprocess
-from termcolor import colored
 from qav.questions import Question
 from qav.validators import ListValidator
 
