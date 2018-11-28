@@ -1,4 +1,3 @@
-
 import os, sys, uuid, yaml, subprocess
 from qav.questions import Question
 from qav.validators import ListValidator

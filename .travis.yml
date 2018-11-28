@@ -31,6 +31,7 @@ before_install:
   - tox
 
 install:
+  - pip install -r requirements.txt
   - make install
 
 before_script:
