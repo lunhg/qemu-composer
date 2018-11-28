@@ -19,23 +19,23 @@ parser.add_argument('push', help='push generated docker images (similar to docke
 
 # Export a main function to tests
 def main(**kwargs):
-    return qemu(**kwargs)
 
-# Run if this script is called directly
-if __name__ is '__main__':
-    args = parser.parse_args()
-
-    if args.version:
-        main(version=__version__)
-    if not args.version and not args.help:
-        main(
-            prefix=args.prefix or os.path.join(os.environ['PWD']),
-            file=args.file or '.qemu.yml',
-            group=args.group or 'wheel',
-            gid=args.gid or 1000,
-            uid=args.uid or 1000,
-            build=args.build or True,
-            up=args.up or False,
-            push=args.push or False
-        )
+    # Run if this script is called directly
+    if __name__ is '__main__':
+        args = parser.parse_args()
+        if args.help:
+            pass
+        elif args.version and not args.help:
+            print __version__
+        elif not args.version and not args.help:
+            qemu(
+                prefix=args.prefix or os.path.join(os.environ['PWD']),
+                file=args.file or '.qemu.yml',
+                group=args.group or 'wheel',
+                gid=args.gid or 1000,
+                uid=args.uid or 1000,
+                build=args.build or True,
+                up=args.up or False,
+                push=args.push or False
+            )
         sys.exit()

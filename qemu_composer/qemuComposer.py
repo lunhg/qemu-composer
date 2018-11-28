@@ -6,10 +6,7 @@ from qav.validators import ListValidator
 
 class QemuComposer(object):
 
-    VERSION="0.0.1"
-
     def __init__(self, **kwargs):
-        self.version = kwargs.get('version')
         self.group = kwargs.get('group')
         self.gid = kwargs.get('gid')
         self.uid = kwargs.get('uid')
@@ -22,17 +19,13 @@ class QemuComposer(object):
         options = " ".join(str(x) for x in self.qemu['options'])
         commands = " ".join(str(x) for x in self.qemu['commands'])
         
-        self.register = "%s %s %s" % (
-            options,
-            self.qemu['register'],
-            commands
-        )
+        self.register = self.__own_register__(options, commands)
         self.images = self.__images__()
         self.commands = []
         
     def __id__(self):
         return uuid.uuid4().hex
-
+        
     def __qemu__(self, f):
         __qemu__ = open(os.path.join(self.prefix, f), 'r')
         return yaml.load(__qemu__)
@@ -50,6 +43,13 @@ class QemuComposer(object):
         return images
 
 
+    def __own_register__(self, options, commands):
+         self.register = "%s %s %s" % (
+             options,
+             self.qemu['register'],
+             commands
+         )
+
     def __register__(self, cmd):
         self.commands.append(cmd)
 
@@ -66,6 +66,7 @@ class QemuComposer(object):
         ]:
             self.__register__(e)
 
+    
     def __build__(self):
         self.__register__([
             "docker",
@@ -331,30 +332,17 @@ class QemuComposer(object):
                             )
                         ])
 
-        dockerComposeCmd = ""
-        if (self.up and not self.build):
-            dockerComposeCmd = "up -d --build"
-        if (self.build and not self.up):
-            dockerComposeCmd = "build -d"
-        if (self.push and not self.up):
-            dockerComposeCmd = "push -d"
-
-        self.__register__([
-            "docker-compose",
-            "--project-path",
-            "%s/%s" % (self.prefix, self.qemu['prefix']),
-            "--file",
-            "docker-compose.yml",
-            dockerComposeCmd
-        ])
+        if (self.build or self.up or self.push):
+            self.__register__([
+                "docker-compose",
+                "--project-path",
+                "%s/%s" % (self.prefix, self.qemu['prefix']),
+                "up -d --build" if self.up and not self.build else ("build -d" if self.build and not self.up else ("push" if self.push and not self.up and not self.build else "images"))
+            ])
 
     def make(self):
-        if self.version:
-            print kwargs.get('version')
-            sys.exit()
-        else:
-            self.__createDir__()
-            self.__build__()
-            for cmd in self.commands:
-                print("[ exec ] %s" % cmd)
-                subprocess.call(cmd)
+        self.__createDir__()
+        self.__build__()
+        for cmd in self.commands:
+            print("[ exec ] %s" % cmd)
+            subprocess.call(cmd)
